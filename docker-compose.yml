@@ -1,9 +1,11 @@
 version: '3'
 services:
+  # nodes
   mnesia-node1:
     build: ./mnesia
     container_name: node1
     hostname: node1
+    command: -s app_mnesia start mnesia@node2 mnesia@node3
     networks:
      - net1
 
@@ -11,6 +13,13 @@ services:
     build: ./mnesia
     container_name: node2
     hostname: node2
+    networks:
+     - net1
+
+  mnesia-node3:
+    build: ./mnesia
+    container_name: node3
+    hostname: node3
     networks:
      - net1
 

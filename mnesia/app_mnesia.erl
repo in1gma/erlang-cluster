@@ -1,16 +1,25 @@
 -module(app_mnesia).
 -import(lists, [foreach/2]).
--export([start/0]).
+-export([start/1]).
 
 -record(esp, {name, power, cost}).
 
-start() ->
-   io:format("mnesia: createing ...\n"),
+start(Args) ->
+   ping_nodes(Args),
+   create_db(),
+   operations(). %% fill and test
+
+create_db() ->
    mnesia:create_schema([node()|nodes()]),
    mnesia:start(),
-   mnesia:create_table(esp, [{disc_copies, [node()|nodes()]}, {type, set}, {attributes, record_info(fields, esp)}]),
-   io:format("mnesia: created!!\n"),
-   operations().
+   mnesia:create_table(esp, [{ram_copies, [node()|nodes()]}, {type, set}, {attributes, record_info(fields, esp)}]).
+
+ping_nodes(Nodes) ->
+   io:format("Nodes to ping: ~p\n", [Nodes]),
+   foreach(fun(Node) ->
+      io:format("Node: ~p is ~p\n", [Node, net_adm:ping(Node)])
+   end, Nodes),
+   io:format("All nodes: ~p\n", [[node()|nodes()]]).
 
 operations() ->
    mnesia:wait_for_tables([esp], 20000),
