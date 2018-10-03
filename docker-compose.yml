@@ -1,0 +1,20 @@
+version: '3'
+services:
+  mnesia-node1:
+    build: ./mnesia
+    container_name: node1
+    hostname: node1
+    networks:
+     - net1
+
+  mnesia-node2:
+    build: ./mnesia
+    container_name: node2
+    hostname: node2
+    networks:
+     - net1
+
+# allows containers to communicate by hostnames
+networks:
+  net1:
+    driver: bridge
