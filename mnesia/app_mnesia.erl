@@ -1,14 +1,54 @@
 -module(app_mnesia).
--export([start/0, stop/0]).
+-import(lists, [foreach/2]).
+-export([start/0]).
+% -include_lib("stdlib/include/qlc.hrl"). %% to call qlc:q(...)
 
 -record(esp, {name, power, cost}).
 
 start() ->
-   io:format("mnesia: starting ...\n"),
-   mnesia:create_schema([node()|nodes()]),
+   io:format("mnesia: createing ...\n"),
+   mnesia:create_schema([node()]),
    mnesia:start(),
-   mnesia:create_table(esp, [{disk_copies, [node()|nodes()]}, {attributes, record_info(fields, esp)}]),
-   io:format("mnesia: started!!\n").
+   mnesia:create_table(esp, [{attributes, record_info(fields, esp)}]),
+   io:format("mnesia: created!!\n"),
+   operations().
 
-stop() ->
-   mnesia:stop().  
+operations() ->
+   mnesia:wait_for_tables([esp], 20000),
+   fill_tables(),
+   traverse_table_and_show(esp).
+   
+data() ->
+   [
+      {esp, borets, 115, 1000},
+      {esp, alnas, 125, 1213},
+      {esp, novomet, 100, 900}
+   ].
+
+fill_tables() ->
+   mnesia:clear_table(esp),
+   F = fun() ->
+      foreach(fun mnesia:write/1, data())
+   end,
+   mnesia:transaction(F).
+
+traverse_table_and_show(Table_name)->
+   Iterator = fun(Rec,_)->
+      io:format("~p~n",[Rec]),
+         []
+      end,
+   case mnesia:is_transaction() of
+      true -> mnesia:foldl(Iterator,[],Table_name);
+      false -> 
+         Exec = fun({Fun,Tab}) -> mnesia:foldl(Fun, [],Tab) end,
+         mnesia:activity(transaction,Exec,[{Iterator,Table_name}],mnesia_frag)
+      end.
+
+%% select() ->
+%%    do(qlc:q([X || X <- mnesia:table(esp)])).
+
+%% do(Q) ->
+%%     F = fun() -> qlc:e(Q) end,
+%%     {atomic, Val} = mnesia:transaction(F),
+%%     Val.
+
