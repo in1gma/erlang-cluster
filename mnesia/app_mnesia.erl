@@ -1,15 +1,14 @@
 -module(app_mnesia).
 -import(lists, [foreach/2]).
 -export([start/0]).
-% -include_lib("stdlib/include/qlc.hrl"). %% to call qlc:q(...)
 
 -record(esp, {name, power, cost}).
 
 start() ->
    io:format("mnesia: createing ...\n"),
-   mnesia:create_schema([node()]),
+   mnesia:create_schema([node()|nodes()]),
    mnesia:start(),
-   mnesia:create_table(esp, [{attributes, record_info(fields, esp)}]),
+   mnesia:create_table(esp, [{disc_copies, [node()|nodes()]}, {type, set}, {attributes, record_info(fields, esp)}]),
    io:format("mnesia: created!!\n"),
    operations().
 
@@ -43,12 +42,3 @@ traverse_table_and_show(Table_name)->
          Exec = fun({Fun,Tab}) -> mnesia:foldl(Fun, [],Tab) end,
          mnesia:activity(transaction,Exec,[{Iterator,Table_name}],mnesia_frag)
       end.
-
-%% select() ->
-%%    do(qlc:q([X || X <- mnesia:table(esp)])).
-
-%% do(Q) ->
-%%     F = fun() -> qlc:e(Q) end,
-%%     {atomic, Val} = mnesia:transaction(F),
-%%     Val.
-
