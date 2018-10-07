@@ -1,29 +1,36 @@
 -module(app_mnesia).
 -import(lists, [foreach/2]).
--export([start/1]).
+-export([init/1]).
 
 -record(esp, {name, power, cost}).
 
-start(Args) ->
-   ping_nodes(Args),
+init(Args) ->
    create_db(),
-   operations(). %% fill and test
+   ping_nodes(Args),
+   make_cluster(),
+   test().
 
 create_db() ->
-   mnesia:create_schema([node()|nodes()]),
+   mnesia:create_schema([node()]),
    mnesia:start(),
-   mnesia:create_table(esp, [{ram_copies, [node()|nodes()]}, {type, set}, {attributes, record_info(fields, esp)}]).
+   mnesia:create_table(esp, [{disc_copies, [node()]}, {attributes, record_info(fields, esp)}]).
 
 ping_nodes(Nodes) ->
-   io:format("Nodes to ping: ~p\n", [Nodes]),
    foreach(fun(Node) ->
-      io:format("Node: ~p is ~p\n", [Node, net_adm:ping(Node)])
-   end, Nodes),
-   io:format("All nodes: ~p\n", [[node()|nodes()]]).
+      net_adm:ping(Node)
+   end, Nodes).
 
-operations() ->
-   mnesia:wait_for_tables([esp], 20000),
+make_cluster() ->
+   mnesia:change_config(extra_db_nodes, nodes()),
+   foreach(fun(Node) ->
+      mnesia:change_table_copy_type(schema, Node, disc_copies),
+      mnesia:add_table_copy(esp, Node, disc_copies)
+   end, nodes()).
+
+test() ->
+   io:format("All nodes: ~p\n", [[node()|nodes()]]),
    fill_tables(),
+   mnesia:info(),
    traverse_table_and_show(esp).
    
 data() ->

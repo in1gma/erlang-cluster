@@ -5,7 +5,7 @@ services:
     build: ./mnesia
     container_name: node1
     hostname: node1
-    command: -s app_mnesia start mnesia@node2 mnesia@node3
+    command: -s app_mnesia init mnesia@node2 mnesia@node3
     networks:
      - net1
 
@@ -13,6 +13,7 @@ services:
     build: ./mnesia
     container_name: node2
     hostname: node2
+    command: -eval "application:start(mnesia)"
     networks:
      - net1
 
@@ -20,6 +21,7 @@ services:
     build: ./mnesia
     container_name: node3
     hostname: node3
+    command: -eval "application:start(mnesia)"
     networks:
      - net1
 
