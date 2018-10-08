@@ -5,27 +5,23 @@
 -record(esp, {name, power, cost}).
 
 init(Args) ->
-   create_db(),
    ping_nodes(Args),
-   make_cluster(),
+   create_db(),
    test().
 
 create_db() ->
    mnesia:create_schema([node()]),
    mnesia:start(),
-   mnesia:create_table(esp, [{disc_copies, [node()]}, {attributes, record_info(fields, esp)}]).
+   mnesia:change_config(extra_db_nodes, nodes()),
+   foreach(fun(Node) ->
+      mnesia:change_table_copy_type(schema, Node, disc_copies)
+   end, nodes()),
+   mnesia:create_table(esp, [{disc_copies, [node()|nodes()]}, {attributes, record_info(fields, esp)}]).
 
 ping_nodes(Nodes) ->
    foreach(fun(Node) ->
       net_adm:ping(Node)
    end, Nodes).
-
-make_cluster() ->
-   mnesia:change_config(extra_db_nodes, nodes()),
-   foreach(fun(Node) ->
-      mnesia:change_table_copy_type(schema, Node, disc_copies),
-      mnesia:add_table_copy(esp, Node, disc_copies)
-   end, nodes()).
 
 test() ->
    io:format("All nodes: ~p\n", [[node()|nodes()]]),
