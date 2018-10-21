@@ -28,7 +28,7 @@ test() ->
    fill_tables(),
    mnesia:info(),
    traverse_table_and_show(esp).
-   
+
 data() ->
    [
       {esp, borets, 115, 1000},
@@ -50,7 +50,7 @@ traverse_table_and_show(Table_name)->
       end,
    case mnesia:is_transaction() of
       true -> mnesia:foldl(Iterator,[],Table_name);
-      false -> 
+      false ->
          Exec = fun({Fun,Tab}) -> mnesia:foldl(Fun, [],Tab) end,
          mnesia:activity(transaction,Exec,[{Iterator,Table_name}],mnesia_frag)
       end.

@@ -7,7 +7,7 @@ services:
     hostname: node1
     command: -s app_mnesia init mnesia@node2 mnesia@node3
     networks:
-     - net1
+     - backend
 
   mnesia-node2:
     build: ./mnesia
@@ -15,7 +15,7 @@ services:
     hostname: node2
     command: -eval "application:start(mnesia)"
     networks:
-     - net1
+     - backend
 
   mnesia-node3:
     build: ./mnesia
@@ -23,9 +23,19 @@ services:
     hostname: node3
     command: -eval "application:start(mnesia)"
     networks:
-     - net1
+     - backend
+
+  # app
+  n2o-app:
+    build: ./n2o
+    container_name: app
+    hostname: app
+    ports:
+     - 8000:8000
+    networks:
+     - backend
 
 # allows containers to communicate by hostnames
 networks:
-  net1:
+  backend:
     driver: bridge
