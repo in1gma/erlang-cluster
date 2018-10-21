@@ -8,6 +8,9 @@ services:
     command: -s app_mnesia init mnesia@node2 mnesia@node3
     networks:
      - backend
+    depends_on:
+     - mnesia-node2
+     - mnesia-node3
 
   mnesia-node2:
     build: ./mnesia
