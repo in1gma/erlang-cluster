@@ -1,9 +1,9 @@
-{application, review,
+{application, info,
  [
-  {description, "N2O Review Application"},
+  {description, "N2O info Application"},
   {vsn, "2.9"},
   {registered, []},
   {applications, [kernel, stdlib, n2o, kvs]},
-  {mod, { review, []}},
+  {mod, { info, []}},
   {env, []}
  ]}.

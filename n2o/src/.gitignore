@@ -1,0 +1,4 @@
+.applist
+deps
+Mnesia.nonode@nohost
+ebin

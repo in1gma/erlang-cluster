@@ -7,14 +7,14 @@
 main() ->
     case wf:user() of
          undefined -> wf:redirect("login.htm"), redirect_wait();
-         _ -> #dtl{file = "index", app=review,
+         _ -> #dtl{file = "index", app=info,
                    bindings=[{body,body()},
                              {list,list()},
                              {javascript,wf:render(
                                          lists:flatten(
                                          (?MODULE:(wf:config(n2o,mode,dev)))()))}]} end.
 
-prod() ->   [ #script{src="/static/review.min.js"} ].
+prod() ->   [ #script{src="/static/info.min.js"} ].
 dev()  -> [ [ #script{src=lists:concat(["/n2o/protocols/",X,".js"])} || X <- [bert,nitrogen] ],
             [ #script{src=lists:concat(["/n2o/",Y,".js"])}           || Y <- [bullet,n2o,ftp,utf8,validation] ] ].
 
@@ -24,7 +24,7 @@ code() -> case wf:q(<<"code">>) of undefined  -> "../privacy.htm";
                                     Code -> wf:to_list(wf:depickle(Code)) end.
 
 body() ->
-    wf:update(heading,#b{id=heading,body="Review: " ++ code()}),
+    wf:update(heading,#b{id=heading,body="info: " ++ code()}),
     wf:update(logout,#button{id=logout, body="Logout " ++ wf:user(), postback=logout}),
     [ #span{id=upload},#button { id=send, body= <<"Chat">>, postback=chat, source=[message] } ].
 
@@ -54,7 +54,7 @@ event(#client{data={User,Message}}) ->
     wf:wire(#jq{target=message,method=[focus,select]}),
     HTML = wf:to_list(Message),
     wf:info(?MODULE,"HTML: ~tp~n",[HTML]),
-    DTL = #dtl{file="message",app=review,bindings=[{user,User},{color,"gray"},{message,HTML}]},
+    DTL = #dtl{file="message",app=info,bindings=[{user,User},{color,"gray"},{message,HTML}]},
     wf:insert_top(history, wf:jse(wf:render(DTL)));
 
 event(#bin{data=Data}) ->
@@ -73,6 +73,6 @@ event(Event) ->
     ok.
 
 loop(M) ->
-    DTL = #dtl{file="message",app=review,bindings=[{user,"system"},{message,M},{color,"silver"}]},
+    DTL = #dtl{file="message",app=info,bindings=[{user,"system"},{message,M},{color,"silver"}]},
     wf:insert_top(history, wf:jse(wf:render(DTL))),
     wf:flush().

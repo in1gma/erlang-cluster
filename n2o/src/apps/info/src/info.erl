@@ -1,4 +1,4 @@
--module(review).
+-module(info).
 -behaviour(supervisor).
 -behaviour(application).
 -export([init/1, start/2, stop/1, main/1]).
@@ -6,7 +6,7 @@
 
 main(A)    -> mad:main(A).
 start()    -> start(normal,[]).
-start(_,_) -> supervisor:start_link({local,review},review,[]).
+start(_,_) -> supervisor:start_link({local,info},info,[]).
 stop(_)    -> ok.
 
 -define(USERS, [#user{id="maxim",email="maxim@synrc.com"},
@@ -20,7 +20,7 @@ init([]) -> users:init(),
 
 spec()   -> ranch:child_spec(http, 100, ranch_tcp, port(), cowboy_protocol, env()).
 env()    -> [ { env, [ { dispatch, points() } ] } ].
-static() ->   { dir, "apps/review/priv/static", mime() }.
+static() ->   { dir, "apps/info/priv/static", mime() }.
 n2o()    ->   { dir, "deps/n2o/priv",           mime() }.
 mime()   -> [ { mimetypes, cow_mimetypes, all   } ].
 port()   -> [ { port, wf:config(n2o,port,8000)  } ].

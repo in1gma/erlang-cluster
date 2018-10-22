@@ -10,8 +10,8 @@
 
 main() ->
  avz:callbacks(?LOGIN),
- #dtl{file="dev",app=review,bindings=[{title,<<"Login">>},{body,body()},{folders,folders()}]}.
-folders() -> string:join([filename:basename(F)||F<-filelib:wildcard(code:priv_dir(review)++"/snippets/*/")],",").
+ #dtl{file="dev",app=info,bindings=[{title,<<"Login">>},{body,body()},{folders,folders()}]}.
+folders() -> string:join([filename:basename(F)||F<-filelib:wildcard(code:priv_dir(info)++"/snippets/*/")],",").
 
 body() ->
   header() ++
