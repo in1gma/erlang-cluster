@@ -2,3 +2,5 @@
 deps
 Mnesia.nonode@nohost
 ebin
+erlang.log.*
+run_erl.log
