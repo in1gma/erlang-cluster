@@ -14,6 +14,4 @@ WORKDIR /app
 COPY src .
 
 RUN ./mad deps
-RUN ./mad compile plan
-
-CMD ./mad repl
+CMD ./mad clean compile plan repl

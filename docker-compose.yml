@@ -31,8 +31,8 @@ services:
   # app
   n2o-app:
     build: ./n2o
-    container_name: app
-    hostname: app
+    container_name: web
+    hostname: web
     ports:
      - 8000:8000
     networks:
