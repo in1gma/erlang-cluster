@@ -20,6 +20,10 @@ http://www.ostinelli.net/boost-message-passing-between-erlang-nodes/
 
 https://www.ejabberd.im/interconnect-erl-nodes/
 
+https://stackoverflow.com/questions/13539527/give-local-pid-and-node-name-how-to-convert-to-remote-pid
+
+http://erlang.org/pipermail/erlang-questions/2005-August/016593.html
+
 ## Commands
 
 > docker network create ernet

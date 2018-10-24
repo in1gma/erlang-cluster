@@ -13,5 +13,5 @@ RUN apt-get -y install erlang-base-hipe erlang erlang-dev erlang-manpages erlang
 WORKDIR /app
 COPY src .
 
-RUN ./mad deps
-CMD ./mad clean compile plan repl
+RUN ./mad deps compile plan
+ENTRYPOINT make console

@@ -35,6 +35,7 @@ services:
     hostname: web
     ports:
      - 8000:8000
+    tty: true
     networks:
      - backend
 
