@@ -14,4 +14,4 @@ WORKDIR /app
 COPY src .
 
 RUN ./mad deps compile plan
-ENTRYPOINT make console
+CMD make console
