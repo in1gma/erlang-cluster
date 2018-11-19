@@ -1,6 +1,8 @@
 -module(app_mnesia).
 -import(lists, [foreach/2]).
--export([init/1]).
+-export([init/1, select_all/1]).
+
+-include_lib("stdlib/include/qlc.hrl").
 
 -record(esp, {name, power, cost}).
 
@@ -24,10 +26,8 @@ ping_nodes(Nodes) ->
    end, Nodes).
 
 test() ->
-   io:format("All nodes: ~p\n", [[node()|nodes()]]),
    fill_tables(),
-   mnesia:info(),
-   traverse_table_and_show(esp).
+   register(api, spawn(fun loop/0)).
 
 data() ->
    [
@@ -43,14 +43,18 @@ fill_tables() ->
    end,
    mnesia:transaction(F).
 
-traverse_table_and_show(Table_name)->
-   Iterator = fun(Rec,_)->
-      io:format("~p~n",[Rec]),
-         []
-      end,
-   case mnesia:is_transaction() of
-      true -> mnesia:foldl(Iterator,[],Table_name);
-      false ->
-         Exec = fun({Fun,Tab}) -> mnesia:foldl(Fun, [],Tab) end,
-         mnesia:activity(transaction,Exec,[{Iterator,Table_name}],mnesia_frag)
-      end.
+select_all(Table) ->
+    do(qlc:q([X || X <- mnesia:table(Table)])).
+
+do(Q) ->
+    F = fun() -> qlc:e(Q) end,
+    {atomic, Result} = mnesia:transaction(F),
+    Result.
+
+loop() ->
+    receive
+        {select, Params, Sender, Process, Path} ->
+            Result = select_all(Params),
+            {Process, Sender} ! {Path, Result},
+            loop()
+        end.
