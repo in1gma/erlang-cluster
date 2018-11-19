@@ -9,7 +9,7 @@
 init(Args) ->
    ping_nodes(Args),
    create_db(),
-   test().
+   fill_tables().
 
 create_db() ->
    mnesia:create_schema([node()]),
@@ -24,10 +24,6 @@ ping_nodes(Nodes) ->
    foreach(fun(Node) ->
       net_adm:ping(Node)
    end, Nodes).
-
-test() ->
-   fill_tables(),
-   register(api, spawn(fun loop/0)).
 
 data() ->
    [
@@ -51,10 +47,3 @@ do(Q) ->
     {atomic, Result} = mnesia:transaction(F),
     Result.
 
-loop() ->
-    receive
-        {select, Params, Sender, Process, Path} ->
-            Result = select_all(Params),
-            {Process, Sender} ! {Path, Result},
-            loop()
-        end.
